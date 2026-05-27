@@ -1,28 +1,204 @@
 <!doctype html>
 <html>
   <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Meine Seite</title>
     <style>
+      :root{
+        --ground: #e9f5ea;
+      }
+      html,body{
+        height:100%;
+        margin:0;
+      }
       body {
-        margin: 0;
-        height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background-color: #f0f0f0;
+        font-family: system-ui, sans-serif;
+        background: linear-gradient(#f6fbf6, var(--ground));
+        overflow:hidden;
       }
-      .sunflower {
-        width: 250px;
-        height: 250px;
-        border-radius: 50%;
-        object-fit: cover;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        border: 6px solid rgba(255,255,255,0.7);
+      .stage{
+        position:relative;
+        width:100%;
+        height:100vh;
+        display:flex;
+        justify-content:center;
+        align-items:center;
       }
+      /* planting button centered */
+      .plant-button{
+        background: #e23b3b;
+        border: 4px solid rgba(0,0,0,0.12);
+        box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+        color: #fff;
+        font-size:20px;
+        padding:24px 40px;
+        border-radius: 999px;
+        cursor:pointer;
+        transition: background .12s ease, transform .08s ease;
+        user-select:none;
+      }
+      .plant-button:active{ background:#c83232; transform:translateY(2px); }
+
+      /* seed */
+      .seed{
+        position:fixed;
+        width:18px;
+        height:12px;
+        background: linear-gradient(90deg,#6b3b1a,#8b5a2b);
+        border-radius:50% 50% 50% 50% / 60% 60% 40% 40%;
+        transform-origin:center;
+        z-index:20;
+        pointer-events:none;
+      }
+
+      @keyframes fall {
+        to { transform: translateY(var(--landY)); opacity:1 }
+      }
+
+      /* plant (growing) */
+      .plant{
+        position:absolute;
+        bottom:6vh;
+        width:80px;
+        height:120px;
+        display:flex;
+        justify-content:center;
+        align-items:flex-end;
+        pointer-events:none;
+      }
+      .stem{
+        width:6px;
+        background:linear-gradient(#2f7b39,#1e5a29);
+        height:0%;
+        border-radius:4px;
+      }
+      .bloom{
+        width:60px;
+        height:60px;
+        border-radius:50%;
+        background: radial-gradient(circle at 30% 30%, #fff79a, #f6d22d 40%, #e2931f 70%);
+        transform:scale(0);
+        box-shadow:0 6px 18px rgba(0,0,0,0.12);
+      }
+      .flower-name{
+        position:absolute;
+        bottom:120%;
+        left:50%;
+        transform:translateX(-50%);
+        background:rgba(255,255,255,0.9);
+        padding:6px 10px;
+        border-radius:6px;
+        font-size:14px;
+        text-decoration:none;
+        color:#1b3b18;
+        pointer-events:auto;
+      }
+
     </style>
   </head>
   <body>
-    <img class="sunflower" src="https://upload.wikimedia.org/wikipedia/commons/4/40/Sunflower_sky_backdrop.jpg" alt="Sunflower">
+    <div class="stage">
+      <button id="plantBtn" class="plant-button">Plant a seed</button>
+    </div>
+
+    <script>
+      // Minimal embedded list of 100 flower names (links built to Wikipedia)
+      const flowers = [
+        'Rose','Tulip','Sunflower','Daisy','Orchid','Lily','Daffodil','Marigold','Chrysanthemum','Iris',
+        'Peony','Carnation','Hyacinth','Lotus','Poppy','Jasmine','Lavender','Azalea','Begonia','Zinnia',
+        'Snapdragon','Gladiolus','Anemone','Aster','Freesia','Geranium','Gardenia','Camellia','Magnolia','Hibiscus',
+        'Fuchsia','Petunia','Ranunculus','Salvia','Sweet_pea','Verbena','Phlox','Yarrow','Nigella','Impatiens',
+        'Columbine','Larkspur','Coneflower','Forget-me-not','Morning_glory','Heliotrope','Calendula','Coreopsis','Lobelia','Rudbeckia',
+        'Scabiosa','Statice','Tuberose','Waxflower','Dianthus','Calla_lily','Bleeding_heart','Buttercup','Canna','Canterbury_bell',
+        'Chocolate_cosmos','Clarkia','Cosmos','Crocus','Cyclamen','Echinacea','Gazania','Hellebore','Liatris','Lupin',
+        'Mallow','Monkshood','Nasturtium','Oleander','Pansy','Peony','Plumeria','Primrose','Rhododendron','Rosemary',
+        'Sea_holly','Shasta_daisy','Stephanotis','Sunflower','Sweet_william','Tansy','Verbascum','Violet','Wisteria','Zinnia',
+        'Foxglove','Japanese_anemone','Ranunculus','Bottlebrush','Garden_phlox','Autumn_crocus','Bottle_gentian','Colchicum','Dutch_iris','Evening_primrose'
+      ].slice(0,100);
+
+      function wikiURL(name){
+        return 'https://en.wikipedia.org/wiki/' + encodeURIComponent(name.replace(/ /g,'_'));
+      }
+
+      // Fun name parts
+      const funAdjectives = ['Radiant','Gentle','Mighty','Whispering','Glittering','Silent','Brave','Silly','Noble','Playful','Twinkling','Fiery'];
+      const funNouns = ['Destroyer of Darkness','Dancer of Dew','Keeper of Sunlight','Tickler of Bees','Guardian of Mornings','Dreamer of Meadows','Bright Sprout','Joy Bringer','Petal Pirate','Skywatcher'];
+
+      const stage = document.querySelector('.stage');
+      const btn = document.getElementById('plantBtn');
+
+      function randomInt(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
+
+      btn.addEventListener('click', ()=>{
+        // Spawn a seed from a random X at the top of the viewport
+        const seed = document.createElement('div');
+        seed.className = 'seed';
+        const seedWidth = 18;
+        const startX = Math.floor(Math.random() * Math.max(1, (window.innerWidth - seedWidth)));
+        const startTop = -24; // start slightly above the viewport
+        seed.style.left = startX + 'px';
+        seed.style.top = startTop + 'px';
+        document.body.appendChild(seed);
+
+        // animate fall to ground (target ~80% viewport height)
+        const landY = (window.innerHeight * 0.8) - startTop;
+        seed.style.setProperty('--landY', landY + 'px');
+        seed.style.transition = 'transform linear';
+        seed.style.animation = `fall ${randomInt(900,1400)}ms linear forwards`;
+
+        seed.addEventListener('animationend', ()=>{
+          // determine center X of seed and plant there
+          const landedX = parseFloat(seed.style.left) || startX;
+          const seedCenterX = landedX + (seedWidth/2);
+          seed.remove();
+          plantAt(seedCenterX);
+        }, {once:true});
+      });
+
+      function plantAt(x){
+        const plant = document.createElement('div');
+        plant.className = 'plant';
+        // position using percent
+        const pct = Math.max(5, Math.min(95, (x / window.innerWidth) * 100));
+        plant.style.left = pct + '%';
+
+        const stem = document.createElement('div'); stem.className='stem';
+        const bloom = document.createElement('div'); bloom.className='bloom';
+        plant.appendChild(stem);
+        plant.appendChild(bloom);
+        stage.appendChild(plant);
+
+        // growth animation duration between 10-25s
+        const growSeconds = randomInt(10,25);
+
+        // animate stem height and bloom scale using JS interval
+        const start = performance.now();
+        function tick(now){
+          const t = Math.min(1, (now - start) / (growSeconds*1000));
+          stem.style.height = (t * 70) + '%';
+          bloom.style.transform = `scale(${t})`;
+          if(t < 1) requestAnimationFrame(tick);
+          else onFullyGrown(plant);
+        }
+        requestAnimationFrame(tick);
+      }
+
+      function onFullyGrown(plant){
+        // pick a random flower
+        const name = flowers[Math.floor(Math.random()*flowers.length)].replace(/_/g,' ');
+        const fun = funAdjectives[Math.floor(Math.random()*funAdjectives.length)] + ' ' + funNouns[Math.floor(Math.random()*funNouns.length)];
+        const anchor = document.createElement('a');
+        anchor.className = 'flower-name';
+        anchor.href = wikiURL(name);
+        anchor.target = '_blank';
+        anchor.rel = 'noopener noreferrer';
+        anchor.textContent = `${name}, ${fun}`;
+        plant.appendChild(anchor);
+      }
+
+      // Keep layout responsive on resize
+      window.addEventListener('resize', ()=>{});
+    </script>
   </body>
 </html>
-n
