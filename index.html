@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Meine Seite</title>
+    <title>PlantSomeSeeds</title>
     <style>
       :root{
         --ground: #e9f5ea;
@@ -60,48 +60,244 @@
       .plant{
         position:absolute;
         bottom:6vh;
-        width:80px;
-        height:120px;
+        width:100px;
+        height:140px;
         display:flex;
-        justify-content:center;
-        align-items:flex-end;
+        flex-direction:column;
+        justify-content:flex-end;
+        align-items:center;
         pointer-events:none;
       }
-      .stem{
-        width:6px;
-        background:linear-gradient(#2f7b39,#1e5a29);
-        height:0%;
-        border-radius:4px;
-      }
       .bloom{
-        width:60px;
-        height:60px;
-        border-radius:50%;
-        background: radial-gradient(circle at 30% 30%, #fff79a, #f6d22d 40%, #e2931f 70%);
-        background-size: cover;
-        background-position: center;
+        position:relative;
+        width:140px;
+        height:120px;
+        border-radius:8px;
+        overflow:hidden;
+        display:flex;
+        justify-content:center;
+        align-items:center;
         transform:scale(0);
         box-shadow:0 6px 18px rgba(0,0,0,0.12);
+        background: transparent;
+      }
+      .decay-overlay{
+        position:absolute;
+        inset:0;
+        background: rgba(40,20,10,0);
+        opacity:0;
+        pointer-events:none;
+      }
+      .bloom-img{
+        width:100%;
+        height:100%;
+        object-fit:contain;
+        display:block;
+        background:transparent;
+        transform:scale(0);
+        transition: transform .3s linear;
       }
       .flower-name{
         position:absolute;
         bottom:120%;
         left:50%;
         transform:translateX(-50%);
-        background:rgba(255,255,255,0.9);
-        padding:6px 10px;
-        border-radius:6px;
         font-size:14px;
         text-decoration:none;
-        color:#1b3b18;
+        color: #fff;
+        text-shadow: 0 2px 6px rgba(0,0,0,0.6);
         pointer-events:auto;
+        text-align:center;
+        line-height:1.1;
       }
-
+      .flower-name .title{ font-weight:700; display:block; }
+      .flower-name .fun{ font-weight:400; display:block; font-size:13px; opacity:0.95 }
+      .bee{
+        position:fixed;
+        width:28px;
+        height:24px;
+        background: linear-gradient(90deg, #ffe066 40%, #000 40%, #000 60%, #ffe066 60%);
+        border-radius:50% 50% 45% 45%;
+        box-shadow:0 2px 8px rgba(0,0,0,0.25);
+        z-index:30;
+        pointer-events:none;
+        transform:translate(-50%,-50%) rotate(0deg);
+      }
+      .bee::before{
+        content:'';
+        position:absolute;
+        left:50%;
+        top:20%;
+        width:18px;
+        height:16px;
+        background:rgba(255,255,255,0.9);
+        border-radius:50%;
+        transform:translateX(-50%);
+      }
+      .bee.warrior{
+        box-shadow:0 2px 14px rgba(255,140,0,0.45);
+      }
+      .bee .weapon-icon{
+        position:absolute;
+        width:16px;
+        height:16px;
+        right:-6px;
+        bottom:-4px;
+        border-radius:50%;
+        background:#fff;
+        padding:2px;
+        box-shadow:0 2px 6px rgba(0,0,0,0.2);
+      }
+      .hive{
+        position:absolute;
+        width:80px;
+        height:60px;
+        background:transparent;
+        overflow:visible;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        pointer-events:none;
+      }
+      .hive img{
+        width:100%;
+        height:100%;
+        display:block;
+        position:relative;
+        z-index:2;
+      }
+      .hive-bee{
+        position:absolute;
+        width:18px;
+        height:16px;
+        background: linear-gradient(90deg, #ffe066 40%, #000 40%, #000 60%, #ffe066 60%);
+        border-radius:50% 50% 45% 45%;
+        box-shadow:0 1px 5px rgba(0,0,0,0.2);
+        pointer-events:none;
+        top:24px;
+        left:40px;
+        transform: translate(-50%, -50%);
+        z-index:1;
+      }
+      .hive-bee.front{
+        z-index:3;
+      }
+      .hive .health-bar{
+        position:absolute;
+        left:50%;
+        bottom:108%;
+        transform:translateX(-50%);
+        width:72px;
+        height:10px;
+        background: rgba(255,255,255,0.9);
+        border:1px solid rgba(0,0,0,0.12);
+        border-radius:999px;
+        overflow:hidden;
+      }
+      .hive .health-fill{
+        width:100%;
+        height:100%;
+        background: linear-gradient(90deg, #4caf50, #8bc34a);
+        transition: width .2s ease;
+      }
+      .health-bar{
+        position:absolute;
+        left:50%;
+        transform:translateX(-50%);
+        bottom:100%;
+        width:52px;
+        height:8px;
+        background: rgba(255,255,255,0.8);
+        border:1px solid rgba(0,0,0,0.12);
+        border-radius:999px;
+        overflow:hidden;
+        margin-bottom:6px;
+      }
+      .health-fill{
+        width:100%;
+        height:100%;
+        background: linear-gradient(90deg, #4caf50, #8bc34a);
+        transition: width .2s ease;
+      }
+      .poll-meter{
+        position:fixed;
+        top:16px;
+        left:16px;
+        display:flex;
+        align-items:center;
+        gap:10px;
+        background:rgba(255,255,255,0.92);
+        border:1px solid rgba(0,0,0,0.12);
+        border-radius:999px;
+        padding:10px 14px;
+        box-shadow:0 12px 30px rgba(0,0,0,0.12);
+        z-index:120;
+        font-weight:700;
+      }
+      .poll-icon{
+        font-size:20px;
+      }
+      .attack-effect, .explosion{
+        position:absolute;
+        pointer-events:none;
+        border-radius:50%;
+        opacity:0.95;
+        transform:translate(-50%,-50%);
+      }
+      .attack-effect{
+        width:14px;
+        height:14px;
+        background:rgba(255,255,255,0.9);
+        box-shadow:0 0 10px rgba(255,255,255,0.9);
+      }
+      .explosion{
+        width:0;
+        height:0;
+        background:rgba(255,190,0,0.9);
+        box-shadow:0 0 20px rgba(255,120,0,0.9);
+      }
+      .wasp{
+        position:fixed;
+        width:30px;
+        height:24px;
+        background: linear-gradient(90deg,#000 30%,#ffe066 30%,#ffe066 50%,#000 50%,#000 70%,#ffe066 70%);
+        border-radius:50% 50% 45% 45%;
+        box-shadow:0 3px 12px rgba(0,0,0,0.3);
+        transform:translate(-50%,-50%) rotate(0deg);
+        z-index:40;
+        pointer-events:none;
+      }
+      .wasp::before{
+        content:'';
+        position:absolute;
+        left:50%;
+        top:12%;
+        width:8px;
+        height:10px;
+        background:#000;
+        border-radius:50%;
+        transform:translateX(-50%);
+      }
+      .wasp::after{
+        content:'';
+        position:absolute;
+        right:-4px;
+        top:40%;
+        width:6px;
+        height:6px;
+        background:#000;
+        border-radius:50% 50% 50% 0;
+        transform:rotate(30deg);
+      }
     </style>
   </head>
   <body>
     <div class="stage">
       <button id="plantBtn" class="plant-button">Plant a seed</button>
+    </div>
+    <div class="poll-meter" aria-label="Poll-o-meter">
+      <span class="poll-icon">🌼</span>
+      <span id="pollCount">0</span>
     </div>
 
     <script>
@@ -119,22 +315,70 @@
         'Foxglove','Japanese_anemone','Ranunculus','Bottlebrush','Garden_phlox','Autumn_crocus','Bottle_gentian','Colchicum','Dutch_iris','Evening_primrose'
       ].slice(0,100);
 
-      // SVG variants for different flowers encoded to data URLs
-      function svgDataUrl(svg){ return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg); }
-      const flowerSVGs = [
-        // Sunflower
-        svgDataUrl(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><rect width='100%' height='100%' fill='none'/><g><circle cx='100' cy='100' r='30' fill='#6b3b1a'/><g fill='#ffd23a'>` +
-          Array.from({length:12}).map((_,i)=>`<ellipse rx='18' ry='40' transform='rotate(${i*30} 100 100) translate(0 -40)' cx='100' cy='100'/>`).join('') +
-        `</g></g></svg>`),
-        // Tulip
-        svgDataUrl(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><path d='M100 30 C80 30 60 60 60 90 C60 120 90 140 100 160 C110 140 140 120 140 90 C140 60 120 30 100 30 Z' fill='#e94b77'/><rect x='96' y='160' width='8' height='30' fill='#2f7b39'/></svg>`),
-        // Daisy
-        svgDataUrl(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><g fill='#fff'><g>` +
-          Array.from({length:16}).map((_,i)=>`<ellipse rx='12' ry='36' transform='rotate(${i*22.5} 100 100) translate(0 -48)' cx='100' cy='100'/>`).join('') +
-        `</g></g><circle cx='100' cy='100' r='20' fill='#f6d22d'/></svg>`),
-        // Rose (stylized)
-        svgDataUrl(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><g fill='#c33'><path d='M100 70 C88 60 75 65 70 75 C66 85 70 95 80 100 C90 105 108 100 115 95 C125 88 125 80 120 74 C114 68 106 72 100 70 Z'/><path d='M100 90 C92 86 82 88 78 96 C74 104 80 114 90 118 C100 122 112 118 118 112 C124 106 124 98 118 94 C112 90 104 92 100 90 Z' opacity='0.9'/></g><rect x='98' y='118' width='4' height='40' fill='#2f7b39'/></svg>`)
+      // Photo URLs for different flower varieties (used for blooms)
+      const flowerPNGs = [
+        'https://img.icons8.com/emoji/256/sunflower-emoji.png',
+        'https://img.icons8.com/emoji/256/hibiscus-emoji.png',
+        'https://img.icons8.com/emoji/256/rose-emoji.png',
+        'https://img.icons8.com/emoji/256/tulip-emoji.png',
+        'https://img.icons8.com/emoji/256/blossom-emoji.png',
+        'https://img.icons8.com/emoji/256/cherry-blossom-emoji.png',
+        'https://img.icons8.com/emoji/256/potted-plant-emoji.png',
+        'https://img.icons8.com/emoji/256/white-flower-emoji.png'
       ];
+      // placeholder PNG (small data URI, 1x1 transparent PNG fallback)
+      const placeholderPng = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGNgYAAAAAMAASsJTYQAAAAASUVORK5CYII=';
+
+      // fetch a PNG thumbnail from Wikipedia if available
+      async function fetchFlowerThumbnail(name){
+        try{
+          const base = 'https://en.wikipedia.org/w/api.php?origin=*';
+          // 1) try pageimage thumbnail
+          const url = base + '&action=query&titles='+encodeURIComponent(name)+'&prop=pageimages&pithumbsize=500&format=json';
+          const res = await fetch(url);
+          if(!res.ok) return null;
+          const data = await res.json();
+          const pages = data.query && data.query.pages;
+          if(pages){
+            const page = Object.values(pages)[0];
+            if(page && page.thumbnail && page.thumbnail.source){
+              const thumb = page.thumbnail.source;
+              if(/\.png(\?|$)/i.test(thumb)) return thumb; // it's already PNG
+              // otherwise continue to search for PNG files on the page
+            }
+          }
+
+          // 2) list images on the page and prefer PNG
+          const imgListUrl = base + '&action=query&titles='+encodeURIComponent(name)+'&prop=images&format=json';
+          const res2 = await fetch(imgListUrl);
+          if(!res2.ok) return null;
+          const data2 = await res2.json();
+          const pages2 = data2.query && data2.query.pages;
+          if(!pages2) return null;
+          const page2 = Object.values(pages2)[0];
+          if(page2 && page2.images){
+            for(const im of page2.images){
+              const title = im.title; // like 'File:Something.png'
+              if(/\.png$/i.test(title)){
+                // fetch imageinfo for this file
+                const infoUrl = base + '&action=query&titles='+encodeURIComponent(title)+'&prop=imageinfo&iiprop=url&format=json';
+                const r3 = await fetch(infoUrl);
+                if(!r3.ok) continue;
+                const d3 = await r3.json();
+                const p3 = d3.query && d3.query.pages && Object.values(d3.query.pages)[0];
+                if(p3 && p3.imageinfo && p3.imageinfo[0] && p3.imageinfo[0].url) return p3.imageinfo[0].url;
+              }
+            }
+          }
+
+          // 3) fall back to the earlier thumbnail if present
+          if(pages){
+            const page = Object.values(pages)[0];
+            if(page && page.thumbnail && page.thumbnail.source) return page.thumbnail.source;
+          }
+          return null;
+        }catch(e){ return null; }
+      }
 
       function wikiURL(name){
         return 'https://en.wikipedia.org/wiki/' + encodeURIComponent(name.replace(/ /g,'_'));
@@ -144,10 +388,550 @@
       const funAdjectives = ['Radiant','Gentle','Mighty','Whispering','Glittering','Silent','Brave','Silly','Noble','Playful','Twinkling','Fiery'];
       const funNouns = ['Destroyer of Darkness','Dancer of Dew','Keeper of Sunlight','Tickler of Bees','Guardian of Mornings','Dreamer of Meadows','Bright Sprout','Joy Bringer','Petal Pirate','Skywatcher'];
 
+      let plantedFlowerCount = 0;
+      let flowerIdCounter = 0;
+      let pollCount = 0;
       const stage = document.querySelector('.stage');
       const btn = document.getElementById('plantBtn');
+      const visitorBees = [];
+      const hiveElements = [];
+      const wasps = [];
+
+      const beeSettings = {
+        minSpeed: 3200,
+        maxSpeed: 5200,
+        minRest: 5000,
+        maxRest: 12000,
+        minFlowerWait: 1800,
+        maxFlowerWait: 4200
+      };
+
+      const weaponChoices = [
+        { type: 'axt', label: 'Axt', img: 'axt.png', damage: 18, range: 24, speed: 3600, suicide: false },
+        { type: 'sword', label: 'Sword', img: 'Sword.png', damage: 12, range: 22, speed: 4200, suicide: false },
+        { type: 'spear', label: 'Spear', img: 'Spear.png', damage: 8, range: 40, speed: 3200, suicide: false },
+        { type: 'bomb', label: 'Bomb', img: 'Bomb.png', damage: 999, range: 80, speed: 3200, suicide: true },
+        { type: 'squishy', label: 'Squishy Hammer', img: 'Squic.png', damage: 5, range: 18, speed: 4000, suicide: false }
+      ];
+
+      const waspSettings = {
+        minSpeed: 3200,
+        maxSpeed: 5200,
+        minHealth: 36,
+        maxHealth: 54,
+        minPower: 5,
+        maxPower: 9
+      };
+
+      function updatePollMeter(delta){
+        pollCount = Math.max(0, pollCount + delta);
+        document.getElementById('pollCount').textContent = pollCount;
+      }
+
+      function playSquishSound(){
+        try{
+          const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(120, audioCtx.currentTime);
+          gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.25);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start();
+          osc.stop(audioCtx.currentTime + 0.25);
+        }catch(e){ }
+      }
+
+      function getRandomPlant(){
+        const plants = stage.querySelectorAll('.plant');
+        return plants.length ? plants[Math.floor(Math.random()*plants.length)] : null;
+      }
+
+      function getAvailablePlants(){
+        return Array.from(stage.querySelectorAll('.plant')).filter(p => !p.dataset.reservedBy);
+      }
+
+      function findPlantById(id){
+        return stage.querySelector(`.plant[data-flower-id="${id}"]`);
+      }
+
+      function reservePlant(plant, bee){
+        if(!plant || plant.dataset.reservedBy) return false;
+        plant.dataset.reservedBy = bee.dataset.beeId;
+        bee.dataset.targetFlowerId = plant.dataset.flowerId;
+        return true;
+      }
+
+      function releasePlant(bee){
+        if(!bee.dataset.targetFlowerId) return;
+        const plant = findPlantById(bee.dataset.targetFlowerId);
+        if(plant && plant.dataset.reservedBy === bee.dataset.beeId){
+          delete plant.dataset.reservedBy;
+        }
+        delete bee.dataset.targetFlowerId;
+      }
+
+      function randomBeeSpeed(){ return randomInt(beeSettings.minSpeed, beeSettings.maxSpeed); }
+      function randomRestDuration(){ return randomInt(beeSettings.minRest, beeSettings.maxRest); }
+      function randomFlowerWait(){ return randomInt(beeSettings.minFlowerWait, beeSettings.maxFlowerWait); }
+
+      function getRandomEdgePosition(){
+        const edge = Math.floor(Math.random() * 4);
+        const padding = 40;
+        switch(edge){
+          case 0: return { x: -padding, y: randomInt(padding, window.innerHeight - padding) };
+          case 1: return { x: window.innerWidth + padding, y: randomInt(padding, window.innerHeight - padding) };
+          case 2: return { x: randomInt(padding, window.innerWidth - padding), y: -padding };
+          default: return { x: randomInt(padding, window.innerWidth - padding), y: window.innerHeight + padding };
+        }
+      }
+
+      function getFlowerCenter(plant){
+        const rect = plant.getBoundingClientRect();
+        return {
+          x: rect.left + rect.width / 2,
+          y: rect.top + rect.height / 2
+        };
+      }
+
+      function getHiveCenter(hive){
+        const rect = hive.getBoundingClientRect();
+        return {
+          x: rect.left + rect.width / 2,
+          y: rect.top + rect.height / 2
+        };
+      }
+
+      function chooseBeeSource(){
+        if(hiveElements.length === 0) return 'offscreen';
+        return Math.random() < 0.5 ? 'hive' : 'offscreen';
+      }
+
+      function chooseTargetFlower(bee){
+        const available = getAvailablePlants();
+        if(available.length === 0) return null;
+        const plant = available[Math.floor(Math.random() * available.length)];
+        return reservePlant(plant, bee) ? plant : null;
+      }
+
+      function getEntityCenter(elm){
+        const rect = elm.getBoundingClientRect();
+        return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+      }
+
+      function getDistance(a, b){
+        const dx = a.x - b.x;
+        const dy = a.y - b.y;
+        return Math.sqrt(dx * dx + dy * dy);
+      }
+
+      function chooseWaspTarget(){
+        const targets = [];
+        visitorBees.forEach(bee => { if(bee.isConnected) targets.push({ type: 'bee', element: bee }); });
+        hiveElements.forEach(hive => { if(hive.isConnected) targets.push({ type: 'hive', element: hive }); });
+        if(targets.length === 0) return null;
+        return targets[randomInt(0, targets.length - 1)];
+      }
+
+      function createWasp(){
+        const wasp = document.createElement('div');
+        wasp.className = 'wasp';
+        wasp.dataset.waspId = `wasp-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
+        const speed = randomInt(waspSettings.minSpeed, waspSettings.maxSpeed);
+        const health = randomInt(waspSettings.minHealth, waspSettings.maxHealth);
+        const power = randomInt(waspSettings.minPower, waspSettings.maxPower);
+        wasp.dataset.speed = speed.toString();
+        wasp.dataset.health = health.toString();
+        wasp.dataset.maxHealth = health.toString();
+        wasp.dataset.power = power.toString();
+        document.body.appendChild(wasp);
+        wasps.push(wasp);
+        const start = getRandomEdgePosition();
+        wasp.style.left = start.x + 'px';
+        wasp.style.top = start.y + 'px';
+        moveWaspToTarget(wasp);
+      }
+
+      function spawnWasp(){
+        createWasp();
+      }
+
+      function spawnWaspBatch(count){
+        for(let i = 0; i < count; i++) createWasp();
+      }
+
+      function moveWaspToTarget(wasp){
+        if(!wasp.isConnected) return;
+        const target = chooseWaspTarget();
+        if(!target){
+          setTimeout(() => { if(wasp.isConnected) moveWaspToTarget(wasp); }, 1200);
+          return;
+        }
+        const from = getEntityCenter(wasp);
+        const to = getEntityCenter(target.element);
+        animateBeeFlight(wasp, from, to, parseInt(wasp.dataset.speed, 10), () => {
+          applyWaspImpact(wasp, target);
+        });
+      }
+
+      function updateHiveHealth(hive){
+        const max = parseInt(hive.dataset.maxHealth, 10);
+        const value = Math.max(0, Math.min(max, parseInt(hive.dataset.health, 10)));
+        hive.dataset.health = value.toString();
+        const fill = hive.querySelector('.health-fill');
+        if(fill){
+          const percent = (value / max) * 100;
+          fill.style.width = `${percent}%`;
+          if(percent < 40){
+            fill.style.background = 'linear-gradient(90deg, #f44336, #ff9800)';
+          } else if(percent < 70){
+            fill.style.background = 'linear-gradient(90deg, #ffeb3b, #8bc34a)';
+          } else {
+            fill.style.background = 'linear-gradient(90deg, #4caf50, #8bc34a)';
+          }
+        }
+        if(value <= 0) removeHive(hive);
+      }
+
+      function removeHive(hive){
+        if(!hive.isConnected) return;
+        const index = hiveElements.indexOf(hive);
+        if(index !== -1) hiveElements.splice(index, 1);
+        hive.remove();
+      }
+
+      function removeWasp(wasp){
+        if(!wasp.isConnected) return;
+        const index = wasps.indexOf(wasp);
+        if(index !== -1) wasps.splice(index, 1);
+        wasp.remove();
+      }
+
+      function showAttackEffect(point){
+        const pulse = document.createElement('div');
+        pulse.className = 'attack-effect';
+        pulse.style.left = point.x + 'px';
+        pulse.style.top = point.y + 'px';
+        document.body.appendChild(pulse);
+        pulse.animate([
+          { transform: 'translate(-50%, -50%) scale(0.3)', opacity: 1 },
+          { transform: 'translate(-50%, -50%) scale(1.4)', opacity: 0 }
+        ], { duration: 280, easing: 'ease-out' }).onfinish = () => pulse.remove();
+      }
+
+      function showExplosion(point, radius){
+        const burst = document.createElement('div');
+        burst.className = 'explosion';
+        burst.style.left = point.x + 'px';
+        burst.style.top = point.y + 'px';
+        document.body.appendChild(burst);
+        burst.animate([
+          { width: '0px', height: '0px', opacity: 0.85 },
+          { width: `${radius * 2}px`, height: `${radius * 2}px`, opacity: 0 }
+        ], { duration: 420, easing: 'ease-out' }).onfinish = () => burst.remove();
+      }
+
+      function findNearestWasp(bee){
+        let nearest = null;
+        let best = Infinity;
+        const source = getEntityCenter(bee);
+        wasps.forEach(wasp => {
+          if(!wasp.isConnected) return;
+          const distance = getDistance(source, getEntityCenter(wasp));
+          if(distance < best){ best = distance; nearest = wasp; }
+        });
+        return nearest;
+      }
+
+      function applyWaspImpact(wasp, target){
+        if(!wasp.isConnected) return;
+        if(!target.element.isConnected){
+          setTimeout(() => { if(wasp.isConnected) moveWaspToTarget(wasp); }, 600);
+          return;
+        }
+        const point = getEntityCenter(target.element);
+        showAttackEffect(point);
+        if(target.type === 'hive'){
+          target.element.dataset.health = (parseInt(target.element.dataset.health, 10) - parseInt(wasp.dataset.power, 10)).toString();
+          updateHiveHealth(target.element);
+        } else if(target.type === 'bee'){
+          const remaining = parseInt(target.element.dataset.health, 10) - parseInt(wasp.dataset.power, 10);
+          target.element.dataset.health = Math.max(0, remaining).toString();
+          if(remaining <= 0) removeBee(target.element);
+        }
+        if(wasp.isConnected) setTimeout(() => { if(wasp.isConnected) moveWaspToTarget(wasp); }, 900);
+      }
+
+      function removeBee(bee){
+        if(!bee.isConnected) return;
+        releasePlant(bee);
+        const idx = visitorBees.indexOf(bee);
+        if(idx !== -1) visitorBees.splice(idx, 1);
+        bee.remove();
+      }
+
+      function engageWarrior(bee, flower){
+        const targetWasp = findNearestWasp(bee);
+        if(!targetWasp){
+          return returnBeeHome(bee, flower);
+        }
+        const from = getFlowerCenter(flower);
+        const to = getEntityCenter(targetWasp);
+        animateBeeFlight(bee, from, to, parseInt(bee.dataset.weaponSpeed, 10), () => {
+          if(!bee.isConnected) return;
+          applyWarriorStrike(bee, targetWasp);
+          if(bee.isConnected && bee.dataset.weaponSuicide !== '1'){
+            returnBeeHome(bee, flower);
+          }
+        });
+      }
+
+      function applyWarriorStrike(bee, wasp){
+        const weaponType = bee.dataset.weaponType;
+        const targetPoint = getEntityCenter(wasp);
+        if(weaponType === 'bomb'){
+          showExplosion(targetPoint, parseInt(bee.dataset.weaponRange, 10));
+          wasps.slice().forEach(candidate => {
+            if(!candidate.isConnected) return;
+            if(getDistance(targetPoint, getEntityCenter(candidate)) <= parseInt(bee.dataset.weaponRange, 10)){
+              removeWasp(candidate);
+            }
+          });
+          removeBee(bee);
+          return;
+        }
+        showAttackEffect(targetPoint);
+        if(weaponType === 'squishy') playSquishSound();
+        const damage = parseInt(bee.dataset.weaponDamage, 10);
+        const remaining = parseInt(wasp.dataset.health, 10) - damage;
+        wasp.dataset.health = Math.max(0, remaining).toString();
+        if(remaining <= 0) removeWasp(wasp);
+      }
+
+      function returnBeeHome(bee, flower){
+        const hive = hiveElements.length ? getRandomHive() : null;
+        const from = getFlowerCenter(flower);
+        const destination = hive ? getEntityCenter(hive) : getRandomEdgePosition();
+        animateBeeFlight(bee, from, destination, randomBeeSpeed(), () => {
+          if(!bee.isConnected) return;
+          if(hive && bee.dataset.kind === 'normal'){
+            hive.dataset.health = Math.min(parseInt(hive.dataset.maxHealth, 10), parseInt(hive.dataset.health, 10) + 6).toString();
+            updateHiveHealth(hive);
+          }
+          if(hive) updatePollMeter(1);
+          restBee(bee);
+        });
+      }
+
+      function createVisitorBee(){
+        const bee = document.createElement('div');
+        bee.className = 'bee';
+        const isWarrior = wasps.length > 0 && Math.random() < 0.45;
+        if(isWarrior){
+          const weapon = weaponChoices[randomInt(0, weaponChoices.length - 1)];
+          bee.classList.add('warrior');
+          bee.dataset.weaponType = weapon.type;
+          bee.dataset.weaponDamage = weapon.damage.toString();
+          bee.dataset.weaponRange = weapon.range.toString();
+          bee.dataset.weaponSpeed = weapon.speed.toString();
+          bee.dataset.weaponSuicide = weapon.suicide ? '1' : '0';
+          const icon = document.createElement('img');
+          icon.className = 'weapon-icon';
+          icon.src = weapon.img;
+          icon.alt = weapon.label;
+          bee.appendChild(icon);
+        } else {
+          bee.dataset.weaponType = 'none';
+        }
+        bee.dataset.type = 'visitor';
+        bee.dataset.beeId = `bee-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
+        bee.dataset.kind = isWarrior ? 'warrior' : 'normal';
+        const health = isWarrior ? 52 : 60;
+        bee.dataset.health = health.toString();
+        bee.dataset.maxHealth = health.toString();
+        bee.dataset.speed = randomBeeSpeed();
+        bee.dataset.restCount = '0';
+        bee.dataset.source = chooseBeeSource();
+        bee.hidden = true;
+        document.body.appendChild(bee);
+        visitorBees.push(bee);
+        startBeeCycle(bee);
+      }
+
+      function animateBeeFlight(bee, from, to, duration, onfinish){
+        if(!bee.isConnected) return;
+        bee.style.left = from.x + 'px';
+        bee.style.top = from.y + 'px';
+        const rotationStart = from.x <= to.x ? -18 : 18;
+        const rotationEnd = from.x <= to.x ? 18 : -18;
+        const midX = (from.x + to.x) / 2;
+        const midY = (from.y + to.y) / 2;
+        const sway = Math.min(24, Math.abs(to.y - from.y) + 8);
+
+        const keyframes = [
+          { left: from.x + 'px', top: from.y + 'px', transform: `translate(-50%,-50%) rotate(${rotationStart}deg)` },
+          { left: midX + 'px', top: (midY + (from.y < to.y ? -sway : sway)) + 'px', transform: `translate(-50%,-50%) rotate(${rotationStart / 2}deg)` },
+          { left: midX + 'px', top: (midY + (from.y < to.y ? sway : -sway)) + 'px', transform: `translate(-50%,-50%) rotate(${rotationEnd / 2}deg)` },
+          { left: to.x + 'px', top: to.y + 'px', transform: `translate(-50%,-50%) rotate(${rotationEnd}deg)` }
+        ];
+
+        const anim = bee.animate(keyframes, { duration, easing: 'ease-in-out', fill: 'forwards' });
+        anim.onfinish = () => {
+          bee.style.left = to.x + 'px';
+          bee.style.top = to.y + 'px';
+          bee.style.transform = `translate(-50%,-50%) rotate(${rotationEnd}deg)`;
+          if(typeof onfinish === 'function') onfinish();
+        };
+      }
+
+      function startBeeCycle(bee){
+        if(!bee.isConnected) return;
+        releasePlant(bee);
+        bee.dataset.source = chooseBeeSource();
+        const flower = chooseTargetFlower(bee);
+        if(!flower){
+          return restBee(bee);
+        }
+
+        bee.dataset.restCount = '0';
+        bee.hidden = false;
+        bee.dataset.speed = randomBeeSpeed();
+
+        const from = bee.dataset.source === 'hive' && hiveElements.length
+          ? getHiveCenter(getRandomHive())
+          : getRandomEdgePosition();
+        const to = getFlowerCenter(flower);
+
+        animateBeeFlight(bee, from, to, parseInt(bee.dataset.speed, 10), () => {
+          if(!bee.isConnected) return;
+          const waitMs = randomFlowerWait();
+          setTimeout(() => {
+            if(!bee.isConnected) return;
+            if(bee.dataset.kind === 'warrior' && wasps.length){
+              engageWarrior(bee, flower);
+            } else {
+              returnBeeHome(bee, flower);
+            }
+          }, waitMs);
+        });
+      }
+
+      function restBee(bee){
+        if(!bee.isConnected) return;
+        releasePlant(bee);
+        const restCount = Math.min(2, parseInt(bee.dataset.restCount, 10) + 1);
+        bee.dataset.restCount = restCount.toString();
+        bee.hidden = true;
+        bee.getAnimations().forEach(anim => anim.cancel());
+
+        const restMs = randomRestDuration();
+        setTimeout(() => {
+          if(!bee.isConnected) return;
+          if(restCount >= 2){
+            return despawnBee(bee);
+          }
+          bee.hidden = false;
+          bee.dataset.speed = randomBeeSpeed();
+          bee.dataset.source = chooseBeeSource();
+          startBeeCycle(bee);
+        }, restMs);
+      }
+
+      function despawnBee(bee){
+        if(!bee.isConnected) return;
+        releasePlant(bee);
+        const index = visitorBees.indexOf(bee);
+        if(index !== -1) visitorBees.splice(index, 1);
+        bee.remove();
+      }
+
+      function getRandomHive(){
+        return hiveElements[Math.floor(Math.random() * hiveElements.length)];
+      }
+
+      function addHive(index){
+        if(hiveElements.length >= index) return;
+        const buttonRect = btn.getBoundingClientRect();
+        const hive = document.createElement('div');
+        hive.className = 'hive';
+        const hiveImg = document.createElement('img');
+        hiveImg.src = 'beehive_PNG1-3198683716.png';
+        hiveImg.alt = 'hive';
+        hive.appendChild(hiveImg);
+        const healthBar = document.createElement('div');
+        healthBar.className = 'health-bar';
+        const healthFill = document.createElement('div');
+        healthFill.className = 'health-fill';
+        healthBar.appendChild(healthFill);
+        hive.appendChild(healthBar);
+        hive.dataset.health = '100';
+        hive.dataset.maxHealth = '100';
+
+        const left = buttonRect.left + (index === 1 ? 0 : index === 2 ? 110 : 220);
+        const top = buttonRect.bottom + 12;
+        hive.style.left = left + 'px';
+        hive.style.top = top + 'px';
+        if(index === 2) hive.style.transform = 'rotate(6deg)';
+        if(index === 3) hive.style.transform = 'rotate(-4deg)';
+        document.body.appendChild(hive);
+        hiveElements.push(hive);
+
+        for(let i = 0; i < 3; i++){
+          const hiveBee = document.createElement('div');
+          hiveBee.className = 'hive-bee';
+          hive.appendChild(hiveBee);
+        }
+        startHiveOrbit(hive);
+      }
+
+      function startHiveOrbit(hive){
+        function tick(now){
+          if(!hive.isConnected) return;
+          const bees = hive.querySelectorAll('.hive-bee');
+          const elapsed = now - (hive.dataset.orbitStart ? parseInt(hive.dataset.orbitStart, 10) : (hive.dataset.orbitStart = Date.now(), parseInt(hive.dataset.orbitStart, 10)));
+          bees.forEach((hiveBee, index) => {
+            const period = 2600 + index * 250;
+            const angle = ((elapsed + index * 120) % period) / period * Math.PI * 2;
+            const x = Math.cos(angle) * 28;
+            const y = Math.sin(angle) * 14;
+            hiveBee.style.left = `${40 + x}px`;
+            hiveBee.style.top = `${28 + y}px`;
+            hiveBee.classList.toggle('front', Math.sin(angle) > 0);
+          });
+          requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
+      }
+
+      function checkBeeEvents(){
+        if(plantedFlowerCount > 0 && plantedFlowerCount % 10 === 0){
+          createVisitorBee();
+          spawnWasp();
+        }
+        const nextHiveIndex = hiveElements.length + 1;
+        if(plantedFlowerCount >= nextHiveIndex * 100 && nextHiveIndex <= 3){
+          addHive(nextHiveIndex);
+          spawnWaspBatch(5);
+          updatePollMeter(5);
+        }
+      }
 
       function randomInt(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
+
+      // Background hill/field images - choose one at random on load
+      const backgrounds = [
+        'https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1600&q=80',
+        'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80',
+        'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=1600&q=80'
+      ];
+      document.addEventListener('DOMContentLoaded', ()=>{
+        const bg = backgrounds[Math.floor(Math.random()*backgrounds.length)];
+        document.body.style.backgroundImage = `url(${bg})`;
+        document.body.style.backgroundSize = 'cover';
+        document.body.style.backgroundPosition = 'center';
+      });
 
       btn.addEventListener('click', ()=>{
         // Spawn a seed from a random X at the top of the viewport
@@ -182,41 +966,79 @@
         const pct = Math.max(5, Math.min(95, (x / window.innerWidth) * 100));
         plant.style.left = pct + '%';
 
-        const stem = document.createElement('div'); stem.className='stem';
         const bloom = document.createElement('div'); bloom.className='bloom';
-        // choose a random SVG variant and use it as the bloom background
-        const svg = flowerSVGs[Math.floor(Math.random()*flowerSVGs.length)];
-        bloom.style.backgroundImage = `url(${svg})`;
-        plant.appendChild(stem);
+        // choose a random photo and use it as the bloom image element
+        const img = document.createElement('img');
+        img.className = 'bloom-img';
+        img.alt = 'flower';
+        bloom.appendChild(img);
         plant.appendChild(bloom);
         stage.appendChild(plant);
 
+        // pick a flower: keep the canonical page title and a display name
+        const rawTitle = flowers[Math.floor(Math.random()*flowers.length)];
+        const displayName = rawTitle.replace(/_/g,' ');
+        plant.dataset.flowerTitle = rawTitle; // canonical title to use in wiki API and link
+        plant.dataset.flowerName = displayName; // human-friendly display name
+        plant.dataset.flowerId = `flower-${++flowerIdCounter}`;
+        plantedFlowerCount += 1;
+
+        // start loading image (prefer PNG if available via wiki)
+        const imgEl = img;
+        imgEl.src = flowerPNGs[Math.floor(Math.random()*flowerPNGs.length)];
+        imgEl.onerror = ()=>{ imgEl.src = flowerPNGs[Math.floor(Math.random()*flowerPNGs.length)]; };
+        fetchFlowerThumbnail(rawTitle).then(url=>{ if(url) imgEl.src = url; }).catch(()=>{});
+
+        // create decay overlay now so it can appear later
+        const decay = document.createElement('div');
+        decay.className = 'decay-overlay';
+        bloom.appendChild(decay);
+
+        checkBeeEvents();
+
         // growth animation duration between 10-25s
         const growSeconds = randomInt(10,25);
-
-        // animate stem height and bloom scale using JS interval
         const start = performance.now();
         function tick(now){
           const t = Math.min(1, (now - start) / (growSeconds*1000));
-          stem.style.height = (t * 70) + '%';
           bloom.style.transform = `scale(${t})`;
+          if(imgEl) imgEl.style.transform = `scale(${t})`;
           if(t < 1) requestAnimationFrame(tick);
-          else onFullyGrown(plant);
+          else onFullyGrown(plant, decay);
         }
         requestAnimationFrame(tick);
       }
 
-      function onFullyGrown(plant){
-        // pick a random flower
-        const name = flowers[Math.floor(Math.random()*flowers.length)].replace(/_/g,' ');
+      function onFullyGrown(plant, decay){
+        // use the flower title chosen at planting for the link, and display the stored display name
+        const pageTitle = plant.dataset.flowerTitle || flowers[Math.floor(Math.random()*flowers.length)];
+        const name = plant.dataset.flowerName || pageTitle.replace(/_/g,' ');
         const fun = funAdjectives[Math.floor(Math.random()*funAdjectives.length)] + ' ' + funNouns[Math.floor(Math.random()*funNouns.length)];
         const anchor = document.createElement('a');
         anchor.className = 'flower-name';
-        anchor.href = wikiURL(name);
+        anchor.href = wikiURL(pageTitle);
         anchor.target = '_blank';
         anchor.rel = 'noopener noreferrer';
-        anchor.textContent = `${name}, ${fun}`;
+        // create two rows: title (flower name) and fun name below
+        const titleSpan = document.createElement('span'); titleSpan.className = 'title'; titleSpan.textContent = name;
+        const funspan = document.createElement('span'); funspan.className = 'fun'; funspan.textContent = fun;
+        anchor.appendChild(titleSpan);
+        anchor.appendChild(funspan);
         plant.appendChild(anchor);
+
+        // plant lifetime decreases as more plants are present
+        const plantCount = Math.max(1, stage.querySelectorAll('.plant').length);
+        const lifeSeconds = Math.max(30, 90 - (plantCount - 1) * 4);
+        const lifeMs = lifeSeconds * 1000;
+
+        decay.style.transition = `opacity ${lifeMs}ms linear`;
+        requestAnimationFrame(()=>{ decay.style.opacity = 0.85; });
+
+        setTimeout(()=>{
+          plant.style.transition = 'opacity 1s ease';
+          plant.style.opacity = '0';
+          setTimeout(()=> plant.remove(), 1000);
+        }, lifeMs);
       }
 
       // Keep layout responsive on resize
